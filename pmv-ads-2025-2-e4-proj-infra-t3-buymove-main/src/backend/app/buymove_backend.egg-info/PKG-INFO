@@ -1,3 +1,23 @@
+Metadata-Version: 2.4
+Name: buymove-backend
+Version: 0.1.0
+Summary: Backend de API para o app movel buyMove com MongoDB
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi==0.115.0
+Requires-Dist: uvicorn[standard]==0.30.3
+Requires-Dist: motor==3.7.1
+Requires-Dist: pydantic==2.9.2
+Requires-Dist: pydantic-settings==2.7.0
+Requires-Dist: passlib[bcrypt]==1.7.4
+Requires-Dist: python-jose[cryptography]==3.3.0
+Requires-Dist: python-multipart==0.0.9
+Requires-Dist: email-validator==2.2.0
+Provides-Extra: dev
+Requires-Dist: httpx==0.27.0; extra == "dev"
+Requires-Dist: pytest==8.3.2; extra == "dev"
+Requires-Dist: pytest-asyncio==0.23.8; extra == "dev"
+
 # buyMove Backend
 
 Backend em Python para sustentar o app mobile (e o site) do projeto buyMove. A API foi construida com FastAPI, usa MongoDB como banco de dados e entrega recursos de autenticacao, catalogo de veiculos e gerenciamento de favoritos. O desenho segue os requisitos levantados na aplicacao web para reutilizacao total no app mobile.
@@ -18,7 +38,7 @@ Backend em Python para sustentar o app mobile (e o site) do projeto buyMove. A A
 
 ## Estrutura de diretorios
 ```
-backend/
+src/backend/
   app/
     core/            # Configuracoes globais, conexao com o Mongo e helpers de seguranca
     dependencies/    # Funcoes reutilizaveis para injetar servicos e autenticacao
@@ -39,7 +59,7 @@ backend/
    ```
 2. Copie o arquivo de variaveis e ajuste as credenciais:
    ```bash
-   cd backend
+   cd src/backend
    copy .env.example .env  # Windows
    # ou
    cp .env.example .env    # Linux/macOS

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
 from pydantic import Field
@@ -8,9 +9,22 @@ from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+BACKEND_DIR = Path(__file__).resolve().parents[2]
+SRC_DIR = BACKEND_DIR.parent
+REPO_ROOT = SRC_DIR.parent
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(".env", "backend/.env", "../.env"),
+        env_file=tuple(
+            str(path)
+            for path in (
+                Path(".env"),
+                BACKEND_DIR / ".env",
+                SRC_DIR / ".env",
+                REPO_ROOT / ".env",
+            )
+        ),
         env_file_encoding="utf-8",
         case_sensitive=False,
     )
