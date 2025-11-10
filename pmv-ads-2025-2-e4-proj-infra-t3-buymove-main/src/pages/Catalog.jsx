@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import BackToHome from "@/components/BackToHome";
 import SearchBar from "@/components/SearchBar";
@@ -35,6 +35,7 @@ export default function Catalog() {
 
   const { data, loading, error } = useFetch(fetcher, [fetcher]);
   const items = data?.items ?? [];
+  const total = typeof data?.total === "number" ? data.total : items.length;
   const hasResults = !loading && !error && items.length > 0;
 
   
@@ -128,7 +129,7 @@ export default function Catalog() {
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between text-sm text-slate-500">
                 <span>
-                  {items.length} {items.length === 1 ? "modelo" : "modelos"} encontrados
+                  {total} {total === 1 ? "modelo" : "modelos"} encontrados
                 </span>
                 <span>Ordenados por relevância</span>
               </div>

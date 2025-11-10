@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const useMocks = (import.meta.env.VITE_USE_MOCKS ?? "true") === "true";
+const useMocks = (import.meta.env.VITE_USE_MOCKS ?? "false") === "true";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
   timeout: 10000,
