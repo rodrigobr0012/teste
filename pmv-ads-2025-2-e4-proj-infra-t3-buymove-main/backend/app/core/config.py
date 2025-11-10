@@ -1,0 +1,41 @@
+from __future__ import annotations
+
+from functools import lru_cache
+from typing import List
+
+from pydantic import Field
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=(".env", "backend/.env", "../.env"),
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+    )
+
+    app_name: str = Field(default="buyMove API")
+    environment: str = Field(default="development")
+    mongodb_uri: str = Field(default="mongodb://localhost:27017", alias="MONGODB_URI")
+    mongodb_db: str = Field(default="buymove", alias="MONGODB_DB")
+    jwt_secret: SecretStr = Field(default=SecretStr("change-me"), alias="JWT_SECRET")
+    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
+    access_token_expire_minutes: int = Field(default=60 * 24, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    cors_origins: List[str] = Field(
+        default_factory=lambda: [
+            "http://localhost:5173",
+            "http://localhost:4173",
+            "http://127.0.0.1:5173",
+            "http://localhost:19006",
+        ],
+        alias="CORS_ORIGINS",
+    )
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()
