@@ -6,8 +6,8 @@ import Catalog from "@/pages/Catalog";
 import Favorites from "@/pages/Favorites";
 import Profile from "@/pages/Profile";*/
 import Login from "@/pages/Login";
-/*import Register from "@/pages/Register";
-import VehicleCreate from "@/pages/VehicleCreate";*/
+import Register from "@/pages/Register";
+/*import VehicleCreate from "@/pages/VehicleCreate";*/
 
 export const router = createBrowserRouter([
   {
@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
       { path: "favorites", element: <Favorites /> },
       { path: "profile", element: <Profile /> },*/
       { path: "login", element: <Login /> },
-      /*{ path: "register", element: <Register /> },*/
+      { path: "register", element: <Register /> },
     ],
   },
 ]);
