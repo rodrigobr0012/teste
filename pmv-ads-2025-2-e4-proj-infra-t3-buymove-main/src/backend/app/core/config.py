@@ -3,9 +3,11 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from typing import List
+from urllib.parse import urlparse, urlunparse
 
 from pydantic import Field
 from pydantic import SecretStr
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -45,6 +47,55 @@ class Settings(BaseSettings):
         ],
         alias="CORS_ORIGINS",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _split_cors_origins(cls, values: dict) -> dict:
+        raw_origins = values.get("cors_origins") or values.get("CORS_ORIGINS")
+        if isinstance(raw_origins, str):
+            values["cors_origins"] = [
+                origin.strip()
+                for origin in raw_origins.split(",")
+                if origin and origin.strip()
+            ]
+        return values
+
+    @model_validator(mode="after")
+    def _expand_localhost_aliases(self) -> "Settings":
+        expanded: list[str] = []
+        seen = set()
+
+        for origin in self.cors_origins:
+            if origin not in seen:
+                expanded.append(origin)
+                seen.add(origin)
+
+            parsed = urlparse(origin)
+            hostname = parsed.hostname or ""
+
+            replacements = []
+            if hostname == "localhost":
+                replacements.append("127.0.0.1")
+            elif hostname == "127.0.0.1":
+                replacements.append("localhost")
+
+            for host in replacements:
+                netloc = host
+                if parsed.port:
+                    netloc = f"{host}:{parsed.port}"
+                if parsed.username:
+                    auth = parsed.username
+                    if parsed.password:
+                        auth = f"{auth}:{parsed.password}"
+                    netloc = f"{auth}@{netloc}"
+
+                alternate = urlunparse(parsed._replace(netloc=netloc))
+                if alternate not in seen:
+                    expanded.append(alternate)
+                    seen.add(alternate)
+
+        object.__setattr__(self, "cors_origins", expanded)
+        return self
 
 
 @lru_cache
