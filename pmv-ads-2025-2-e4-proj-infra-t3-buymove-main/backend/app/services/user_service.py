@@ -14,7 +14,7 @@ from ..utils.object_id import object_id_to_str
 async def create_user(db: AsyncIOMotorDatabase, payload: UserCreate) -> UserPublic:
     existing = await db.users.find_one({"email": payload.email.lower()})
     if existing:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="E-mail j? cadastrado")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="E-mail já cadastrado")
 
     now = datetime.now(timezone.utc)
     document = payload.model_dump()
@@ -60,7 +60,7 @@ async def authenticate_user(db: AsyncIOMotorDatabase, email: str, password: str)
 
 def serialize_user(document: dict | None) -> UserPublic:
     if not document:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usu?rio n?o encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
     data = object_id_to_str(document)
     data.pop("hashed_password", None)
     return UserPublic.model_validate(data)
