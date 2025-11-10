@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 const BASE_EMAIL = "contato@buymove.com";
 
@@ -16,6 +16,8 @@ function getWhatsAppLink(phone, title) {
 
 export default function ContactSellerButton({ vehicle, variant = "default", className = "" }) {
   const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+  const menuId = useId();
 
   const contact = useMemo(() => {
     const email = (vehicle?.contactEmail || BASE_EMAIL).trim();
@@ -35,6 +37,30 @@ export default function ContactSellerButton({ vehicle, variant = "default", clas
     return { email, phone, mailto, telLink, whatsappLink };
   }, [vehicle]);
 
+  useEffect(() => {
+    if (!open) return undefined;
+
+    function handleClickOutside(event) {
+      if (!containerRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
   const baseClasses =
     "inline-flex items-center justify-center rounded-full font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
   const styles =
@@ -47,23 +73,32 @@ export default function ContactSellerButton({ vehicle, variant = "default", clas
   }
 
   return (
-    <div className={`relative ${className}`.trim()}>
+    <div ref={containerRef} className={`relative ${className}`.trim()}>
       <button
         type="button"
         className={`${baseClasses} ${styles}`}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((prev) => !prev)}
       >
         Comprar agora
       </button>
 
       {open && (
-        <div className="absolute z-20 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-lg">
+        <div
+          id={menuId}
+          role="menu"
+          aria-label="Opções de contato"
+          className="absolute right-0 z-20 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-lg"
+        >
           <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
             Como deseja prosseguir?
           </p>
           <div className="space-y-2">
             <a
               href={contact.mailto}
+              role="menuitem"
               onClick={handleOptionClick}
               className="block rounded-lg border border-blue-100 px-3 py-2 font-semibold text-blue-700 transition hover:border-blue-200 hover:bg-blue-50"
             >
@@ -72,6 +107,7 @@ export default function ContactSellerButton({ vehicle, variant = "default", clas
             {contact.telLink ? (
               <a
                 href={contact.telLink}
+                role="menuitem"
                 onClick={handleOptionClick}
                 className="block rounded-lg border border-blue-100 px-3 py-2 font-semibold text-blue-700 transition hover:border-blue-200 hover:bg-blue-50"
               >
@@ -87,6 +123,7 @@ export default function ContactSellerButton({ vehicle, variant = "default", clas
                 href={contact.whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                role="menuitem"
                 onClick={handleOptionClick}
                 className="block rounded-lg border border-green-200 px-3 py-2 font-semibold text-green-700 transition hover:border-green-300 hover:bg-green-50"
               >
@@ -103,4 +140,3 @@ export default function ContactSellerButton({ vehicle, variant = "default", clas
     </div>
   );
 }
-
