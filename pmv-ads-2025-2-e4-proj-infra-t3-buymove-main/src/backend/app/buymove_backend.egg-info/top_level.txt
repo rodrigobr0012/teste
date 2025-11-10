@@ -1,6 +1,0 @@
-core
-dependencies
-models
-routers
-services
-utils
